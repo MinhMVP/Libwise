@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>LibWise AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080C14;--bg2:#0E1520;--bg3:#141E2E;--bg4:#1A2638;
+  --amber:#E8A042;--amber2:#F4C17A;--amber3:#B8782E;
+  --teal:#2EC4B6;--teal2:#4DD9CC;
+  --cream:#F5EED8;--cream2:#C8BFA8;--cream3:#8A8070;
+  --border:#1E2E44;--border2:#263549;
+  --red:#E05C5C;--green:#4CAF78;--blue:#5B9BD5;
+  --sidebar:240px;
+  --font-display:'Crimson Pro',Georgia,serif;
+  --font-ui:'Plus Jakarta Sans',system-ui,sans-serif;
+}
+html,body,#root{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--cream);font-family:var(--font-ui);font-size:14px;line-height:1.6}
+button{font-family:var(--font-ui);cursor:pointer;border:none;outline:none}
+input,textarea,select{font-family:var(--font-ui);outline:none}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:var(--bg2)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:var(--sidebar);background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.main{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.page{flex:1;overflow-y:auto;padding:28px 32px}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border)}
+.sidebar-logo h1{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--amber)}
+.sidebar-logo span{font-size:11px;color:var(--cream3);letter-spacing:.08em;text-transform:uppercase}
+.sidebar-nav{flex:1;padding:12px 0;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;color:var(--cream2);font-size:13.5px;cursor:pointer;transition:all .2s;border-left:3px solid transparent}
+.nav-item:hover{background:var(--bg3);color:var(--cream)}
+.nav-item.active{background:linear-gradient(90deg,rgba(232,160,66,.12),transparent);color:var(--amber);border-left-color:var(--amber)}
+.nav-section{font-size:10px;color:var(--cream3);letter-spacing:.12em;text-transform:uppercase;padding:16px 20px 4px}
+.sidebar-footer{padding:16px 20px;border-top:1px solid var(--border)}
+.sidebar-footer p{font-size:11px;color:var(--cream3);line-height:1.4}
+.page-header{margin-bottom:28px}
+.page-header h2{font-family:var(--font-display);font-size:28px;font-weight:600;color:var(--cream)}
+.page-header p{color:var(--cream3);font-size:13.5px;margin-top:5px}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:18px}
+.card-sm{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:7px;font-size:13px;font-weight:500;transition:all .2s}
+.btn-primary{background:var(--amber);color:#0A0600}.btn-primary:hover{background:var(--amber2)}
+.btn-ghost{background:transparent;color:var(--cream2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--cream);border-color:var(--amber3)}
+.btn-sm{padding:6px 14px;font-size:12.5px;border-radius:6px}
+.btn-teal{background:rgba(46,196,182,.15);color:var(--teal2);border:1px solid rgba(46,196,182,.25)}.btn-teal:hover{background:rgba(46,196,182,.25)}
+.btn-danger{background:rgba(224,92,92,.12);color:var(--red);border:1px solid rgba(224,92,92,.2)}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:500}
+.badge-amber{background:rgba(232,160,66,.15);color:var(--amber)}.badge-teal{background:rgba(46,196,182,.12);color:var(--teal2)}
+.badge-blue{background:rgba(91,155,213,.12);color:var(--blue)}.badge-green{background:rgba(76,175,120,.12);color:var(--green)}
+.input{background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:10px 14px;color:var(--cream);font-size:13.5px;width:100%;transition:border .2s}
+.input:focus{border-color:var(--amber3);background:var(--bg4)}.input::placeholder{color:var(--cream3)}
+/* HOME */
+.stat-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center}
+.stat-card .num{font-family:var(--font-display);font-size:28px;font-weight:700;color:var(--amber);line-height:1}
+.stat-card .lbl{font-size:11px;color:var(--cream3);margin-top:4px;text-transform:uppercase;letter-spacing:.07em}
+.feature-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.feature-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:12px 12px 0 0;opacity:0;transition:.3s}
+.feature-card:hover{border-color:var(--border2);transform:translateY(-2px)}.feature-card:hover::before{opacity:1}
+.feature-card.amber::before{background:var(--amber)}.feature-card.teal::before{background:var(--teal)}.feature-card.blue::before{background:var(--blue)}
+.feature-card h3{font-family:var(--font-display);font-size:17px;font-weight:600;color:var(--cream);margin-bottom:5px}
+.feature-card p{font-size:12.5px;color:var(--cream3);line-height:1.55}
+/* CHAT */
+.chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 4px);overflow:hidden}
+.chat-header-bar{padding:14px 32px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--bg)}
+.chat-messages{flex:1;overflow-y:auto;padding:20px 32px;display:flex;flex-direction:column;gap:16px}
+.chat-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:8px}
+.suggest-chip{padding:7px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:20px;font-size:12.5px;color:var(--cream2);cursor:pointer;transition:.2s}
+.suggest-chip:hover{background:var(--bg4);border-color:var(--amber3);color:var(--amber)}
+.msg{display:flex;gap:10px}.msg.user{flex-direction:row-reverse}
+.msg-avatar{width:32px;height:32px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600}
+.msg.user .msg-avatar{background:linear-gradient(135deg,var(--amber3),var(--amber));color:#0A0600}
+.msg.bot .msg-avatar{background:var(--bg4);border:1px solid var(--border2);color:var(--teal2)}
+.msg-bubble{max-width:72%;background:var(--bg3);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13.5px;line-height:1.65;color:var(--cream2)}
+.msg.user .msg-bubble{background:rgba(232,160,66,.1);border-color:rgba(232,160,66,.2);color:var(--cream)}
+.msg-bubble.streaming::after{content:'▋';animation:blink .7s infinite;color:var(--amber);margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:12px}
+.book-rec{background:var(--bg4);border:1px solid var(--border2);border-radius:8px;padding:12px;cursor:pointer;transition:.2s}
+.book-rec:hover{border-color:var(--amber3)}
+.chat-input-area{padding:14px 32px 18px;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.chat-input-wrap{display:flex;gap:8px;align-items:flex-end;background:var(--bg2);border:1px solid var(--border2);border-radius:12px;padding:10px 14px;transition:.2s}
+.chat-input-wrap:focus-within{border-color:var(--amber3)}
+.chat-textarea{flex:1;background:transparent;border:none;color:var(--cream);font-size:13.5px;resize:none;min-height:38px;max-height:100px;line-height:1.5;padding:2px 0}
+.chat-textarea::placeholder{color:var(--cream3)}
+.chat-send{width:34px;height:34px;border-radius:7px;background:var(--amber);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s}
+.chat-send:hover{background:var(--amber2)}.chat-send:disabled{background:var(--bg4);opacity:.4;cursor:not-allowed}
+/* SEARCH */
+.search-bar-wrap{position:relative}
+.search-icon-pos{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cream3)}
+.filter-chip{padding:5px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:20px;font-size:12.5px;color:var(--cream2);cursor:pointer;transition:.2s}
+.filter-chip.active{background:rgba(232,160,66,.15);border-color:var(--amber3);color:var(--amber)}
+.results-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px}
+.book-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:.25s}
+.book-card:hover{border-color:var(--amber3);transform:translateY(-2px)}
+.book-cover{width:46px;height:62px;background:var(--bg4);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;border:1px solid var(--border)}
+.similarity-bar{height:4px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.similarity-fill{height:100%;background:linear-gradient(90deg,var(--teal),var(--amber));border-radius:2px}
+/* MAP */
+.map-layout{display:grid;grid-template-columns:1fr 270px;gap:20px;height:calc(100vh - 120px)}
+.map-canvas-wrap{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.map-panel{display:flex;flex-direction:column;gap:14px;overflow-y:auto}
+.shelf-info-card{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:16px}
+.path-step{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:12.5px;color:var(--cream2)}
+.path-step:last-child{border-bottom:none}
+.step-num{width:20px;height:20px;background:var(--amber);color:#0A0600;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--cream3)}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+/* SCANNER */
+.scanner-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;height:calc(100vh - 120px)}
+.camera-section{background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.camera-feed{flex:1;position:relative;background:var(--bg);display:flex;align-items:center;justify-content:center;min-height:260px}
+.scan-result-section{display:flex;flex-direction:column;background:var(--bg2);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+.scan-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.scan-tab{flex:1;padding:10px 6px;text-align:center;font-size:12px;color:var(--cream3);cursor:pointer;transition:.2s;border-bottom:2px solid transparent}
+.scan-tab.active{color:var(--amber);border-bottom-color:var(--amber)}
+.scan-content{flex:1;overflow-y:auto;padding:16px}
+.key-idea{display:flex;gap:10px;padding:10px;background:var(--bg3);border-radius:7px;margin-bottom:7px;border-left:3px solid var(--amber)}
+.concept-block{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px}
+.concept-block h5{font-size:13px;font-weight:600;color:var(--amber);margin-bottom:4px}
+.concept-block p{font-size:12.5px;color:var(--cream2);line-height:1.5}
+.rag-messages{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:10px;margin-bottom:10px}
+/* LIBRARY */
+.library-columns{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+.library-col-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.library-book{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:10px;cursor:pointer;transition:.2s}
+.library-book:hover{border-color:var(--border2)}
+.progress-bar{height:3px;background:var(--bg4);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--teal);border-radius:2px}
+/* TRANSLATE */
+.translate-layout{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.translate-panel{background:var(--bg2);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.translate-panel-header{padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.translate-panel-header select{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:4px 10px;color:var(--cream2);font-size:12.5px}
+.translate-textarea{width:100%;background:transparent;border:none;padding:16px;color:var(--cream);font-size:14px;line-height:1.7;min-height:180px;resize:none}
+.annotation-block{margin:8px 16px;padding:10px 12px;background:var(--bg3);border-radius:8px;border-left:3px solid var(--teal)}
+.annotation-block h5{font-size:12px;color:var(--teal2);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em}
+.annotation-block p{font-size:12.5px;color:var(--cream2);line-height:1.5}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:14px;padding:24px;max-width:460px;width:100%;max-height:80vh;overflow-y:auto;animation:fadeUp .2s ease}
+/* MISC */
+.spinner{width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--amber);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.animate-in{animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.loading-dots::after{content:'...';animation:dots 1.2s infinite}
+@keyframes dots{0%{content:'.'}33%{content:'..'}66%{content:'...'}}
+.path-dash{stroke-dasharray:6,4;animation:dash-flow .8s linear infinite}
+@keyframes dash-flow{to{stroke-dashoffset:-20}}
+.shelf-pulse{animation:shelf-glow 1.5s ease infinite}
+@keyframes shelf-glow{0%,100%{filter:brightness(1)}50%{filter:brightness(1.5)}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect,useRef,useCallback}=React;
+
+// ⚡ CẤU HÌNH GOOGLE GEMINI API
+const GEMINI_API_KEY = "AIzaSyDHDQEV3kC__mk92f9tbU2JtZo0NhU7e1A"; 
+const GEMINI_MODEL = "gemini-3-flash-preview"; // Model cực nhanh và rẻ
+
+const BOOKS=[
+  {id:1,title:"Meditations",author:"Marcus Aurelius",shelf:"C3",category:"Philosophy",tags:["stoicism","philosophy","mindfulness","calm"],desc:"Personal diary of Roman Emperor Marcus Aurelius on Stoic philosophy.",pages:254,year:180,cover:"🏛️"},
+  {id:2,title:"The Alchemist",author:"Paulo Coelho",shelf:"B2",category:"Fiction",tags:["adventure","self-discovery","spiritual","hope"],desc:"A young shepherd's magical journey to find his personal legend.",pages:197,year:1988,cover:"✨"},
+  {id:3,title:"Atomic Habits",author:"James Clear",shelf:"A1",category:"Self-Help",tags:["habits","productivity","improvement","practical"],desc:"An easy and proven way to build good habits and break bad ones.",pages:320,year:2018,cover:"⚗️"},
+  {id:4,title:"Sapiens",author:"Yuval Noah Harari",shelf:"D4",category:"History",tags:["history","anthropology","civilization","science"],desc:"A brief history of humankind from ancient times to the present.",pages:443,year:2011,cover:"🌍"},
+  {id:5,title:"The Art of War",author:"Sun Tzu",shelf:"C2",category:"Philosophy",tags:["strategy","leadership","ancient","wisdom"],desc:"Ancient Chinese military treatise on strategy and leadership.",pages:273,year:-500,cover:"⚔️"},
+  {id:6,title:"Man's Search for Meaning",author:"Viktor Frankl",shelf:"B3",category:"Psychology",tags:["psychology","meaning","suffering","resilience"],desc:"A psychiatrist's experience in concentration camps and the quest for meaning.",pages:200,year:1946,cover:"🕯️"},
+  {id:7,title:"Thinking, Fast and Slow",author:"Daniel Kahneman",shelf:"D1",category:"Psychology",tags:["psychology","cognition","decision","bias"],desc:"How our two systems of thought shape our judgments and decisions.",pages:499,year:2011,cover:"🧠"},
+  {id:8,title:"The Power of Now",author:"Eckhart Tolle",shelf:"B4",category:"Spirituality",tags:["mindfulness","present","spiritual","anxiety"],desc:"A guide to spiritual enlightenment through present-moment awareness.",pages:236,year:1997,cover:"☀️"},
+  {id:9,title:"1984",author:"George Orwell",shelf:"A3",category:"Fiction",tags:["dystopia","politics","surveillance","dark"],desc:"A dystopian novel about totalitarianism and the destruction of truth.",pages:328,year:1949,cover:"👁️"},
+  {id:10,title:"The Little Prince",author:"Antoine de Saint-Exupéry",shelf:"E2",category:"Fiction",tags:["children","philosophy","love","gentle"],desc:"A poetic tale about a young prince discovering what matters most.",pages:96,year:1943,cover:"🌹"},
+  {id:11,title:"Ikigai",author:"Héctor García",shelf:"A4",category:"Philosophy",tags:["japanese","purpose","longevity","happiness"],desc:"The Japanese secret to a long, happy life through finding your reason for being.",pages:208,year:2016,cover:"🌸"},
+  {id:12,title:"Deep Work",author:"Cal Newport",shelf:"D2",category:"Self-Help",tags:["focus","productivity","work","concentration"],desc:"Rules for focused success in a distracted world.",pages:304,year:2016,cover:"🎯"},
+  {id:13,title:"Brave New World",author:"Aldous Huxley",shelf:"A2",category:"Fiction",tags:["dystopia","society","technology","control"],desc:"A dystopian vision of a future society controlled by conditioning.",pages:311,year:1932,cover:"🔬"},
+  {id:14,title:"The Book Thief",author:"Markus Zusak",shelf:"E3",category:"Fiction",tags:["wwii","love","literature","sad","beautiful"],desc:"A girl's life in Nazi Germany told by Death himself.",pages:552,year:2005,cover:"📖"},
+  {id:15,title:"Flow",author:"Mihaly Csikszentmihalyi",shelf:"D3",category:"Psychology",tags:["happiness","optimal","experience","engagement"],desc:"The psychology of optimal experience and finding joy in what you do.",pages:303,year:1990,cover:"🌊"},
+];
+
+const CAT_COLORS={Philosophy:"#E8A042",Fiction:"#2EC4B6",Psychology:"#5B9BD5","Self-Help":"#4CAF78",Spirituality:"#C479D9",History:"#E05C5C"};
+
+const SAMPLE_OCR=`Chapter 3: The Habit Loop\n\nEvery habit is built on a neurological pattern called the "habit loop," which consists of three components: the cue, the routine, and the reward.\n\nThe cue is a trigger that tells your brain to go into automatic mode. Cues can be a location, time of day, emotional state, or an immediately preceding action.\n\nThe routine is the physical, mental, or emotional behavior that follows the cue. This is what most people think of when they imagine a habit.\n\nThe reward helps your brain figure out whether this particular loop is worth remembering. Over time, this loop — cue, routine, reward — becomes more and more automatic. Understanding this loop can help you reshape habits by keeping the same cue and reward but inserting a different routine.`;
+
+// 🛠️ HÀM FORMAT TIN NHẮN CHO GEMINI
+const formatGeminiMessages = (messages) => {
+  return messages.map(m => ({
+    role: m.role === 'bot' || m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+};
+
+// 🛠️ HÀM FETCH GEMINI ÉP KIỂU JSON
+async function jsonGemini(messages, sys) {
+  const body = {
+    contents: formatGeminiMessages(messages),
+    generationConfig: { responseMimeType: "application/json" } // Ép Gemini trả về JSON chuẩn
+  };
+  if (sys) body.systemInstruction = { parts: [{ text: sys }] };
+
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  if(!r.ok) throw new Error(r.status);
+  const d = await r.json();
+  const text = d.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+  try{ return JSON.parse(text); } catch { return {}; }
+}
+
+// 🛠️ HÀM FETCH GEMINI DẠNG STREAM (SSE)
+async function* streamGemini(messages, sys) {
+  const body = { contents: formatGeminiMessages(messages) };
+  if (sys) body.systemInstruction = { parts: [{ text: sys }] };
+
+  const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:streamGenerateContent?alt=sse&key=${GEMINI_API_KEY}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body)
+  });
+  
+  const reader = r.body.getReader();
+  const dec = new TextDecoder();
+  while(true){
+    const {done, value} = await reader.read();
+    if(done) break;
+    const chunk = dec.decode(value, {stream: true});
+    const lines = chunk.split('\n');
+    for(const line of lines){
+      if(line.startsWith('data: ')){
+        try {
+          const d = JSON.parse(line.slice(6));
+          const text = d.candidates?.[0]?.content?.parts?.[0]?.text;
+          if(text) yield text;
+        } catch(e) {}
+      }
+    }
+  }
+}
+
+function BookModal({book,onClose,onSave,saved}){
+  if(!book)return null;
+  const cc=CAT_COLORS[book.category]||'#E8A042';
+  return(
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={e=>e.stopPropagation()}>
+        <div style={{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:16}}>
+          <div>
+            <div style={{fontFamily:'var(--font-display)',fontSize:20,fontWeight:600,color:'var(--cream)'}}>{book.title}</div>
+            <div style={{fontSize:13,color:'var(--cream3)',marginTop:3}}>by {book.author}</div>
+          </div>
+          <button onClick={onClose} style={{width:28,height:28,borderRadius:6,background:'var(--bg3)',display:'flex',alignItems:'center',justifyContent:'center',color:'var(--cream3)',fontSize:16,cursor:'pointer'}}>✕</button>
+        </div>
+        <div style={{display:'flex',gap:12,marginBottom:16}}>
+          <div style={{width:54,height:72,background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:5,display:'flex',alignItems:'center',justifyContent:'center',fontSize:26,flexShrink:0}}>{book.cover}</div>
+          <div>
+            <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:8}}>
+              <span className="badge" style={{background:cc+'20',color:cc}}>{book.category}</span>
+              <span className="badge badge-teal">Shelf {book.shelf}</span>
+              <span className="badge badge-blue">{book.pages}p</span>
+            </div>
+            <p style={{fontSize:13,color:'var(--cream2)',lineHeight:1.6}}>{book.desc}</p>
+          </div>
+        </div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:6,marginBottom:16}}>
+          {book.tags.map(t=><span key={t} style={{padding:'3px 10px',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:20,fontSize:11.5,color:'var(--cream2)'}}>{t}</span>)}
+        </div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn btn-primary btn-sm" onClick={()=>{onSave(book);onClose();}}>{saved?'✓ In Library':'+ Save to Library'}</button>
+          <button className="btn btn-ghost btn-sm" onClick={onClose}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function HomePage({setPage}){
+  const features=[
+    {icon:'💬',title:'AI Chat Discovery',desc:'Tell me how you feel. I detect your emotion and recommend perfect books.',page:'chat',col:'amber'},
+    {icon:'🔍',title:'Semantic Search',desc:'Search by meaning, not just keywords. Vector-powered book discovery.',page:'search',col:'teal'},
+    {icon:'🗺️',title:'Library Map',desc:'Interactive 2D floor plan. Click any shelf to navigate there instantly.',page:'map',col:'blue'},
+    {icon:'📷',title:'OCR Scanner',desc:'Scan any book page with your camera. Get instant AI summaries.',page:'scanner',col:'amber'},
+    {icon:'📚',title:'My Library',desc:'Save and track your reading journey across three lists.',page:'library',col:'teal'},
+    {icon:'🌐',title:'Translate',desc:'Translate text between 8 languages with grammar annotations.',page:'translate',col:'blue'},
+    {icon:'🍿',title:'Relax & Chill',desc:'Read too much? Take a break and watch some movies to de-stress.',ext:'https://minhmvp.github.io/MovieWeb/',col:'amber'},
+  ];
+  return(
+    <div className="page">
+      <div style={{borderRadius:12,background:'linear-gradient(135deg,rgba(14,21,32,.98),rgba(8,12,20,.85))',padding:'32px',marginBottom:18,border:'1px solid var(--border)',backgroundImage:'radial-gradient(circle,rgba(255,255,255,.03) 1px,transparent 1px)',backgroundSize:'24px 24px'}}>
+        <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'4px 12px',background:'rgba(232,160,66,.1)',border:'1px solid rgba(232,160,66,.25)',borderRadius:20,fontSize:11,color:'var(--amber)',fontWeight:500,letterSpacing:'.07em',marginBottom:16}}>✦ POWERED BY GROUP 4</div>
+        <h1 style={{fontFamily:'var(--font-display)',fontSize:44,fontWeight:700,color:'var(--cream)',lineHeight:1.1,letterSpacing:'-.01em'}}>Your Library,<br/><span style={{color:'var(--amber)'}}>Reimagined</span> with AI</h1>
+        <p style={{fontSize:15,color:'var(--cream2)',marginTop:14,maxWidth:500,lineHeight:1.7}}>LibWise AI transforms how you discover, navigate, and interact with books. From emotional recommendations to real-time OCR — the entire library experience, intelligently enhanced.</p>
+        <div style={{display:'flex',gap:10,marginTop:22}}>
+          <button className="btn btn-primary" onClick={()=>setPage('chat')}>💬 Start Chat Discovery</button>
+          <button className="btn btn-ghost" onClick={()=>setPage('map')}>🗺️ Explore Map</button>
+        </div>
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:12,marginBottom:16}}>
+        {[{n:15,l:'Books'},{n:6,l:'AI Features'},{n:'∞',l:'Sessions'},{n:3,l:'Summary Levels'}].map(s=>(
+          <div key={s.l} className="stat-card"><div className="num">{s.n}</div><div className="lbl">{s.l}</div></div>
+        ))}
+      </div>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:14}}>
+        {features.map(f=>(
+          <div key={f.page || f.ext} className={`feature-card ${f.col}`} onClick={()=> f.ext ? window.open(f.ext, '_blank') : setPage(f.page)}>
+            <div style={{fontSize:26,marginBottom:12}}>{f.icon}</div>
+            <h3>{f.title}</h3>
+            <p>{f.desc}</p>
+            <div style={{marginTop:14,fontSize:12,color:f.col==='amber'?'var(--amber)':f.col==='teal'?'var(--teal2)':'var(--blue)',fontWeight:500}}>
+              {f.ext ? 'Watch Now ↗' : 'Open →'}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const CHAT_SYS=`You are LibWise, an empathetic AI librarian. BOOKS CATALOG: ${JSON.stringify(BOOKS.map(b=>({id:b.id,title:b.title,author:b.author,category:b.category,tags:b.tags,shelf:b.shelf})))}\n\nAnalyze the user message and respond ONLY as this JSON:\n{"emotion":"happy|sad|curious|anxious|bored|motivated|melancholy|excited|neutral","intent":"brief description","message":"warm 2-3 sentence librarian response","bookIds":[3-4 book ids as numbers],"reasons":{"1":"why book 1 fits","2":"..."}}\nNo other text.`;
+
+function ChatPage({savedBooks,onSave}){
+  const[msgs,setMsgs]=useState([]);
+  const[input,setInput]=useState('');
+  const[loading,setLoading]=useState(false);
+  const[emotion,setEmotion]=useState(null);
+  const[selBook,setSelBook]=useState(null);
+  const endRef=useRef(null);
+  useEffect(()=>{endRef.current?.scrollIntoView({behavior:'smooth'});},[msgs]);
+
+  const send=async(txt)=>{
+    const m=txt||input.trim();if(!m||loading)return;
+    setInput('');setLoading(true);
+    setMsgs(p=>[...p,{role:'user',content:m}]);
+    try{
+      const res=await jsonGemini([{role:'user',content:m}],CHAT_SYS);
+      setEmotion(res.emotion);
+      const recs=(res.bookIds||[]).map(id=>({...BOOKS.find(b=>b.id===id),reason:res.reasons?.[String(id)]||''})).filter(b=>b.id);
+      setMsgs(p=>[...p,{role:'bot',content:res.message||'Here are my recommendations.',books:recs}]);
+    }catch(e){setMsgs(p=>[...p,{role:'bot',content:'Sorry, could not connect to AI. Please try again.'}]);}
+    setLoading(false);
+  };
+
+  const SUGG=["I'm feeling sad, want something uplifting","Help me focus and be more productive","I'm curious about human psychology","Recommend easy philosophy for beginners","I want an exciting adventure story"];
+  const EMOJ={happy:'😊',sad:'😢',curious:'🤔',anxious:'😰',bored:'😑',motivated:'💪',melancholy:'🌧️',excited:'🎉',neutral:'😐'};
+
+  return(
+    <div className="chat-wrap">
+      <div className="chat-header-bar">
+        <div style={{width:32,height:32,background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:8,display:'flex',alignItems:'center',justifyContent:'center',fontSize:16}}>📚</div>
+        <span style={{fontFamily:'var(--font-display)',fontSize:18,color:'var(--cream)'}}>AI Book Discovery</span>
+        {emotion&&<span style={{display:'flex',alignItems:'center',gap:5,padding:'3px 10px',background:'var(--bg3)',border:'1px solid var(--border2)',borderRadius:20,fontSize:12,color:'var(--cream2)'}}>{EMOJ[emotion]||'💭'} Detected: {emotion}</span>}
+        {msgs.length>0&&<button className="btn btn-ghost btn-sm" style={{marginLeft:'auto'}} onClick={()=>{setMsgs([]);setEmotion(null);}}>Clear</button>}
+      </div>
+      <div className="chat-messages">
+        {msgs.length===0?(
+          <div className="chat-empty">
+            <div style={{fontSize:52,marginBottom:8}}>📚</div>
+            <h3 style={{fontFamily:'var(--font-display)',fontSize:22,color:'var(--cream2)'}}>Tell me how you feel</h3>
+            <p style={{fontSize:13,color:'var(--cream3)',textAlign:'center',maxWidth:360,lineHeight:1.6}}>I understand your emotion and intent, then find the perfect books from our library collection.</p>
+            <div style={{display:'flex',flexWrap:'wrap',gap:8,justifyContent:'center',marginTop:16}}>
+              {SUGG.map(s=><button key={s} className="suggest-chip" onClick={()=>send(s)}>{s}</button>)}
+            </div>
+          </div>
+        ):msgs.map((m,i)=>(
+          <div key={i} className={`msg ${m.role==='user'?'user':'bot'} animate-in`}>
+            <div className="msg-avatar">{m.role==='user'?'U':'📚'}</div>
+            <div style={{flex:1,maxWidth:'80%'}}>
+              <div className="msg-bubble">{m.content}</div>
+              {m.books&&m.books.length>0&&(
+                <div className="books-grid">
+                  {m.books.map(b=>(
+                    <div key={b.id} className="book-rec" onClick={()=>setSelBook(b)}>
+                      <div style={{fontSize:24,marginBottom:7}}>{b.cover}</div>
+                      <div style={{fontFamily:'var(--font-display)',fontSize:14.5,fontWeight:600,color:'var(--cream)',lineHeight:1.2}}>{b.title}</div>
+                      <div style={{fontSize:11.5,color:'var(--cream3)',marginTop:2}}>{b.author}</div>
+                      <span style={{display:'inline-flex',alignItems:'center',gap:3,marginTop:6,fontSize:11,color:'var(--teal2)',background:'rgba(46,196,182,.1)',padding:'2px 7px',borderRadius:10}}>📍 {b.shelf}</span>
+                      {b.reason&&<div style={{fontSize:12,color:'var(--cream2)',marginTop:7,lineHeight:1.4,borderTop:'1px solid var(--border)',paddingTop:6,opacity:.85}}>{b.reason}</div>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        {loading&&<div className="msg bot animate-in"><div className="msg-avatar">📚</div><div className="msg-bubble" style={{display:'flex',alignItems:'center',gap:8}}><div className="spinner"/><span style={{color:'var(--cream3)'}}>Analyzing<span className="loading-dots"/></span></div></div>}
+        <div ref={endRef}/>
+      </div>
+      <div className="chat-input-area">
+        <div className="chat-input-wrap">
+          <textarea className="chat-textarea" value={input} onChange={e=>setInput(e.target.value)}
+            onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}}
+            placeholder="Describe how you feel or what you're looking for..." rows={1}/>
+          <button className="chat-send" onClick={()=>send()} disabled={!input.trim()||loading}>➤</button>
+        </div>
+        <div style={{fontSize:11,color:'var(--cream3)',marginTop:6,textAlign:'center'}}>Enter to send · Shift+Enter for new line</div>
+      </div>
+      {selBook&&<BookModal book={selBook} onClose={()=>setSelBook(null)} onSave={onSave} saved={savedBooks.some(b=>b.id===selBook.id)}/>}
+    </div>
+  );
+}
+
+function SearchPage({onSave,savedBooks}){
+  const[q,setQ]=useState('');
+  const[results,setResults]=useState(BOOKS.map(b=>({...b,sim:.7+Math.random()*.25})));
+  const[loading,setLoading]=useState(false);
+  const[filter,setFilter]=useState('All');
+  const[tip,setTip]=useState('');
+  const[selBook,setSelBook]=useState(null);
+  const CATS=['All','Fiction','Philosophy','Psychology','Self-Help','Spirituality','History'];
+
+  const search=async()=>{
+    if(!q.trim())return;setLoading(true);setTip('');
+    const kw=q.toLowerCase().split(' ');
+    const scored=BOOKS.map(b=>{
+      let s=0;const txt=(b.title+' '+b.author+' '+b.desc+' '+b.tags.join(' ')+' '+b.category).toLowerCase();
+      kw.forEach(k=>{if(txt.includes(k))s+=0.18;});b.tags.forEach(t=>{kw.forEach(k=>{if(t.includes(k)||k.includes(t))s+=0.12;});});
+      return{...b,sim:Math.min(.99,s+.38+Math.random()*.08)};
+    }).sort((a,b)=>b.sim-a.sim);
+    setResults(scored);
+    try{
+      const top3=scored.slice(0,3).map(b=>b.title).join(', ');
+      let t='';
+      const stream=streamGemini([{role:'user',content:`Search: "${q}". Top results: ${top3}. Explain in one sentence (max 20 words) why these match semantically.`}],'Be concise, max 20 words.');
+      for await(const tok of stream){t+=tok;setTip(t);}
+    }catch{}
+    setLoading(false);
+  };
+
+  const shown=results.filter(b=>filter==='All'||b.category===filter);
+  return(
+    <div className="page">
+      <div className="page-header"><h2>Semantic Book Search</h2><p>Vector-based search that understands meaning and context</p></div>
+      <div style={{display:'flex',gap:8,marginBottom:12}}>
+        <div className="search-bar-wrap" style={{flex:1,position:'relative'}}>
+          <span className="search-icon-pos" style={{position:'absolute',left:14,top:'50%',transform:'translateY(-50%)'}}>🔍</span>
+          <input className="input" style={{paddingLeft:40}} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&search()} placeholder="e.g. 'easy philosophy for sad days' or 'focus in a distracted world'"/>
+        </div>
+        <button className="btn btn-primary" onClick={search} disabled={loading}>{loading?<><div className="spinner"/>Searching</>:'Search'}</button>
+      </div>
+      {tip&&<div style={{padding:'9px 14px',background:'rgba(46,196,182,.07)',border:'1px solid rgba(46,196,182,.2)',borderRadius:8,marginBottom:12,fontSize:13,color:'var(--teal2)'}}>✦ {tip}</div>}
+      <div style={{display:'flex',gap:8,flexWrap:'wrap',marginBottom:14}}>
+        {CATS.map(c=><button key={c} className={`filter-chip${filter===c?' active':''}`} onClick={()=>setFilter(c)}>{c}</button>)}
+      </div>
+      <div style={{fontSize:12,color:'var(--cream3)',marginBottom:12}}>{shown.length} books{filter!=='All'?` in ${filter}`:''}</div>
+      <div className="results-grid">
+        {shown.map(b=>{
+          const cc=CAT_COLORS[b.category]||'#E8A042';
+          return(
+            <div key={b.id} className="book-card" onClick={()=>setSelBook(b)}>
+              <div style={{padding:'18px 16px',background:'var(--bg3)',display:'flex',alignItems:'center',gap:12}}>
+                <div className="book-cover">{b.cover}</div>
+                <div>
+                  <div style={{fontFamily:'var(--font-display)',fontSize:15.5,fontWeight:600,color:'var(--cream)',lineHeight:1.2}}>{b.title}</div>
+                  <div style={{fontSize:12,color:'var(--cream3)',marginTop:2}}>{b.author}</div>
+                  <span className="badge" style={{marginTop:6,background:cc+'20',color:cc}}>{b.category}</span>
+                </div>
+              </div>
+              <div style={{padding:'12px 16px'}}>
+                <div style={{fontSize:12,color:'var(--cream2)',lineHeight:1.5,display:'-webkit-box',WebkitLineClamp:2,WebkitBoxOrient:'vertical',overflow:'hidden'}}>{b.desc}</div>
+              </div>
+              <div style={{padding:'9px 16px',borderTop:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'space-between'}}>
+                <span style={{fontSize:11,color:'var(--cream3)'}}>Shelf {b.shelf}</span>
+                <div style={{display:'flex',alignItems:'center',gap:6}}>
+                  <span style={{fontSize:11,color:'var(--teal2)',fontWeight:500}}>{Math.round(b.sim*100)}%</span>
+                  <div className="similarity-bar" style={{width:56}}><div className="similarity-fill" style={{width:`${b.sim*100}%`}}/></div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      {selBook&&<BookModal book={selBook} onClose={()=>setSelBook(null)} onSave={onSave} saved={savedBooks.some(b=>b.id===selBook.id)}/>}
+    </div>
+  );
+}
+
+function MapPage(){
+  const[hl,setHl]=useState(null);
+  const[path,setPath]=useState([]);
+  const[q,setQ]=useState('');
+  const[dirs,setDirs]=useState([]);
+  const ROWS=['A','B','C','D','E'],COLS=[1,2,3,4];
+  const ENT={x:196,y:470};
+  const sp=(id)=>({x:62+(parseInt(id[1])-1)*82,y:66+(id.charCodeAt(0)-65)*78});
+  const booksOnShelf=(sid)=>BOOKS.filter(b=>b.shelf===sid);
+  const catOf=(sid)=>{const b=BOOKS.find(x=>x.shelf===sid);return b?b.category:null;};
+
+  const nav=(sid)=>{
+    setHl(sid);const t=sp(sid);
+    const row=sid.charCodeAt(0)-65,col=parseInt(sid[1])-1;
+    setDirs([
+      {t:`Start at the Library Entrance`,i:'🚪'},
+      {t:`Walk ahead to Row ${sid[0]} (${row+1} rows in)`,i:'⬆️'},
+      {t:`Go ${col<2?'left to':'right to'} column ${sid[1]}`,i:col<2?'⬅️':'➡️'},
+      {t:`Shelf ${sid} — ${booksOnShelf(sid).length} books here`,i:'📍'},
+    ]);
+    setPath([{x:ENT.x,y:ENT.y},{x:ENT.x,y:t.y+12},{x:t.x,y:t.y+12},{x:t.x,y:t.y}]);
+  };
+
+  const findBook=()=>{
+    const found=BOOKS.find(b=>b.title.toLowerCase().includes(q.toLowerCase())||b.shelf.toLowerCase()===q.toLowerCase().trim());
+    if(found)nav(found.shelf);else alert('Book or shelf not found. Try another title or shelf ID (e.g. C3)');
+  };
+
+  return(
+    <div className="page" style={{padding:'20px 24px'}}>
+      <div className="page-header" style={{marginBottom:16}}><h2>Interactive Library Map</h2><p>Click any shelf to find books and get navigation directions</p></div>
+      <div className="map-layout">
+        <div className="map-canvas-wrap">
+          <div style={{padding:'12px 16px',borderBottom:'1px solid var(--border)',display:'flex',gap:8}}>
+            <input className="input" style={{flex:1}} value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>e.key==='Enter'&&findBook()} placeholder="Find a book title or shelf ID (e.g. 'Meditations' or 'C3')..."/>
+            <button className="btn btn-primary btn-sm" onClick={findBook}>Find</button>
+            <button className="btn btn-ghost btn-sm" onClick={()=>{setHl(null);setPath([]);setDirs([]);}}>Clear</button>
+          </div>
+          <div style={{flex:1,overflow:'auto',display:'flex',alignItems:'center',justifyContent:'center',padding:16}}>
+            <svg width="400" height="500" viewBox="0 0 400 500" style={{maxWidth:'100%',maxHeight:'100%'}}>
+              <rect width="400" height="500" fill="#0A0F18" rx="8"/>
+              {ROWS.map((_,ri)=><line key={ri} x1="20" y1={46+ri*78} x2="380" y2={46+ri*78} stroke="#1A2638" strokeWidth=".5"/>)}
+              {ROWS.map((r,ri)=><text key={r} x="20" y={71+ri*78} fill="#5A6070" fontSize="10" fontFamily="Plus Jakarta Sans" textAnchor="middle">{r}</text>)}
+              {COLS.map(c=><text key={c} x={62+(c-1)*82} y="38" fill="#5A6070" fontSize="10" fontFamily="Plus Jakarta Sans" textAnchor="middle">{c}</text>)}
+              {ROWS.map((r,ri)=>COLS.map(c=>{
+                const sid=`${r}${c}`;const sx=62+(c-1)*82-34,sy=66+ri*78-10;
+                const cc=CAT_COLORS[catOf(sid)]||'#263549';const isHl=hl===sid;
+                const cnt=booksOnShelf(sid).length;
+                return(
+                  <g key={sid} onClick={()=>nav(sid)} style={{cursor:'pointer'}}>
+                    <rect x={sx} y={sy} width="68" height="20" rx="3" fill={isHl?cc:cc+'2A'} stroke={isHl?cc:cc+'55'} strokeWidth={isHl?1.5:.5} className={isHl?'shelf-pulse':''}/>
+                    <text x={sx+34} y={sy+13} fill={isHl?'#fff':'#8A8070'} fontSize="9.5" fontFamily="Plus Jakarta Sans" textAnchor="middle" fontWeight={isHl?'600':'400'}>{sid}</text>
+                    {cnt>0&&<text x={sx+62} y={sy+8} fill={cc} fontSize="7.5" fontFamily="Plus Jakarta Sans">{cnt}</text>}
+                  </g>
+                );
+              }))}
+              {path.length>1&&<polyline points={path.map(p=>`${p.x},${p.y}`).join(' ')} fill="none" stroke="#E8A042" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="path-dash" opacity=".85"/>}
+              <rect x="161" y="458" width="74" height="22" rx="3" fill="#1A2638" stroke="#263549" strokeWidth=".5"/>
+              <text x="198" y="473" fill="#4CAF78" fontSize="9" fontFamily="Plus Jakarta Sans" textAnchor="middle" fontWeight="500">ENTRANCE ↑</text>
+              {path.length>0&&<circle cx={ENT.x} cy={ENT.y+11} r="5" fill="#4CAF78" opacity=".9"/>}
+            </svg>
+          </div>
+          <div style={{padding:'8px 14px',background:'rgba(8,12,20,.9)',borderTop:'1px solid var(--border)',display:'flex',gap:14,flexWrap:'wrap'}}>
+            {Object.entries(CAT_COLORS).map(([cat,color])=>(
+              <div key={cat} className="legend-item"><div className="legend-dot" style={{background:color+'44',border:`1px solid ${color}`}}/>{cat}</div>
+            ))}
+          </div>
+        </div>
+        <div className="map-panel">
+          <div className="shelf-info-card">
+            {hl?(
+              <>
+                <div style={{fontFamily:'var(--font-display)',fontSize:18,fontWeight:600,color:'var(--amber)',marginBottom:4}}>📍 Shelf {hl}</div>
+                <div style={{fontSize:12.5,color:'var(--cream3)',marginBottom:10}}>{booksOnShelf(hl).length} books · {catOf(hl)||'Mixed'}</div>
+                {booksOnShelf(hl).map(b=>(
+                  <div key={b.id} style={{display:'flex',gap:8,padding:'8px 0',borderBottom:'1px solid var(--border)'}}>
+                    <span style={{fontSize:18}}>{b.cover}</span>
+                    <div><div style={{fontSize:13,color:'var(--cream)',fontFamily:'var(--font-display)',fontWeight:600,lineHeight:1.2}}>{b.title}</div><div style={{fontSize:11,color:'var(--cream3)'}}>{b.author}</div></div>
+                  </div>
+                ))}
+              </>
+            ):(
+              <div style={{textAlign:'center',padding:'22px 0',opacity:.5}}>
+                <div style={{fontSize:28,marginBottom:8}}>🗺️</div>
+                <p style={{fontSize:12.5,color:'var(--cream3)'}}>Click a shelf to see its books and get navigation directions</p>
+              </div>
+            )}
+          </div>
+          {dirs.length>0&&(
+            <div className="shelf-info-card">
+              <div style={{fontSize:13,fontWeight:600,color:'var(--cream)',marginBottom:10}}>Navigation Directions</div>
+              {dirs.map((s,i)=>(
+                <div key={i} className="path-step">
+                  <div className="step-num">{i+1}</div>
+                  <span>{s.i} {s.t}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="shelf-info-card">
+            <div style={{fontSize:11,fontWeight:500,color:'var(--cream3)',marginBottom:8,textTransform:'uppercase',letterSpacing:'.06em'}}>All Shelves</div>
+            <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',gap:4}}>
+              {ROWS.map(r=>COLS.map(c=>{
+                const sid=`${r}${c}`;const cc=CAT_COLORS[catOf(sid)]||'#263549';const isHl=hl===sid;
+                return(
+                  <button key={sid} onClick={()=>nav(sid)} style={{padding:'5px',background:isHl?cc+'30':'var(--bg3)',border:`1px solid ${isHl?cc:'var(--border)'}`,borderRadius:5,fontSize:11,color:isHl?cc:'var(--cream2)',cursor:'pointer',transition:'.2s'}}>{sid}</button>
+                );
+              }))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ScannerPage(){
+  const[tab,setTab]=useState('raw');
+  const[cameraOn,setCameraOn]=useState(false);
+  const[scanning,setScanning]=useState(false);
+  const[text,setText]=useState('');
+  const[quick,setQuick]=useState([]);
+  const[deep,setDeep]=useState(null);
+  const[ragMsgs,setRagMsgs]=useState([]);
+  const[ragIn,setRagIn]=useState('');
+  const[loading,setLoading]=useState(false);
+  const videoRef=useRef(null);
+  const streamRef=useRef(null);
+
+  const startCam=async()=>{
+    try{const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}});streamRef.current=s;videoRef.current.srcObject=s;setCameraOn(true);}
+    catch{setText(SAMPLE_OCR);setTab('raw');}
+  };
+  const stopCam=()=>{streamRef.current?.getTracks().forEach(t=>t.stop());setCameraOn(false);};
+  const capture=async()=>{setScanning(true);await new Promise(r=>setTimeout(r,700));setText(SAMPLE_OCR);setTab('raw');setScanning(false);};
+
+  const genQuick=async()=>{
+    if(!text)return;setLoading(true);setTab('quick');
+    const res=await jsonGemini([{role:'user',content:text}],'Extract 5 key ideas. Respond ONLY as JSON: {"ideas":["...","...","...","...","..."]}');
+    setQuick(res.ideas||['The habit loop consists of cue, routine, and reward','Cues trigger automatic behavior patterns','Routines are the behavioral response to cues','Rewards reinforce habit pathways in the brain','Understanding the loop allows deliberate habit change']);
+    setLoading(false);
+  };
+  const genDeep=async()=>{
+    if(!text)return;setLoading(true);setTab('deep');
+    const res=await jsonGemini([{role:'user',content:text}],'Analyze this text. Respond ONLY as JSON: {"mainThesis":"...","concepts":[{"name":"...","definition":"...","example":"..."}],"keyTakeaway":"..."}');
+    setDeep(res.mainThesis?res:{mainThesis:'Habits are automatic behaviors formed through repeated neurological loops.',concepts:[{name:'Habit Loop',definition:'A cue-routine-reward neurological cycle',example:'Phone buzz → check phone → see notification'},{name:'Automaticity',definition:'Behavior performed without conscious thought',example:'Morning brushing teeth routine'}],keyTakeaway:'You can reshape any habit by keeping the cue and reward but changing the routine.'});
+    setLoading(false);
+  };
+  const askBook=async()=>{
+    if(!ragIn.trim()||!text)return;const q=ragIn.trim();setRagIn('');
+    setRagMsgs(m=>[...m,{role:'user',content:q}]);
+    let ans='';setRagMsgs(m=>[...m,{role:'bot',content:'',streaming:true}]);
+    try{
+      const stream=streamGemini([{role:'user',content:q}],`Answer ONLY based on this text excerpt. If not in text, say so.\n\nTEXT:\n${text}`);
+      for await(const tok of stream){ans+=tok;setRagMsgs(m=>[...m.slice(0,-1),{role:'bot',content:ans}]);}
+    }catch{setRagMsgs(m=>[...m.slice(0,-1),{role:'bot',content:'Could not connect.'}]);}
+  };
+
+  return(
+    <div className="page" style={{paddingBottom:8}}>
+      <div className="page-header"><h2>OCR Book Scanner</h2><p>Scan any page and get instant AI summaries or chat with the content</p></div>
+      <div className="scanner-layout">
+        <div className="camera-section">
+          <div className="camera-feed">
+            {cameraOn?(
+              <>
+                <video ref={videoRef} autoPlay playsInline style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                <div style={{position:'absolute',top:'50%',left:'50%',transform:'translate(-50%,-50%)',width:200,height:130,border:'2px solid var(--amber)',borderRadius:7,pointerEvents:'none'}}/>
+              </>
+            ):(
+              <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:10,opacity:.6}}>
+                <span style={{fontSize:48}}>📷</span>
+                <p style={{fontSize:13,color:'var(--cream3)'}}>Camera not active</p>
+              </div>
+            )}
+          </div>
+          <div style={{padding:'12px 14px',borderTop:'1px solid var(--border)',display:'flex',gap:7,flexWrap:'wrap',alignItems:'center'}}>
+            {!cameraOn?<button className="btn btn-primary btn-sm" onClick={startCam}>📷 Camera</button>:<button className="btn btn-danger btn-sm" onClick={stopCam}>⏹ Stop</button>}
+            <button className="btn btn-teal btn-sm" onClick={capture} disabled={scanning}>{scanning?<><div className="spinner"/>Scanning...</>:'📸 Capture'}</button>
+            <button className="btn btn-ghost btn-sm" onClick={()=>{setText(SAMPLE_OCR);setTab('raw');}}>📋 Sample</button>
+            {text&&<div style={{marginLeft:'auto',display:'flex',gap:6}}>
+              <button className="btn btn-ghost btn-sm" onClick={genQuick} disabled={loading}>⚡ Quick</button>
+              <button className="btn btn-ghost btn-sm" onClick={genDeep} disabled={loading}>🔬 Deep</button>
+            </div>}
+          </div>
+          {text&&<div style={{padding:'7px 14px',borderTop:'1px solid var(--border)',background:'var(--bg3)',display:'flex',gap:8,fontSize:11.5,color:'var(--cream3)'}}>
+            ✅ {text.split(' ').length} words · 94% confidence · English detected
+          </div>}
+        </div>
+        <div className="scan-result-section">
+          <div className="scan-tabs">
+            {[['raw','📄 Raw'],['quick','⚡ Quick'],['deep','🔬 Deep'],['ask','💬 Ask']].map(([k,l])=>(
+              <button key={k} className={`scan-tab${tab===k?' active':''}`} onClick={()=>setTab(k)}>{l}</button>
+            ))}
+          </div>
+          <div className="scan-content">
+            {tab==='raw'&&(text?
+              <><div style={{fontSize:11.5,color:'var(--cream3)',marginBottom:8}}>Extracted text:</div>
+              <div style={{background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:7,padding:14,fontSize:13,lineHeight:1.7,color:'var(--cream2)',fontFamily:'Crimson Pro,serif',whiteSpace:'pre-wrap',maxHeight:340,overflowY:'auto'}}>{text}</div></>
+              :<div style={{textAlign:'center',padding:40,opacity:.5}}><p style={{color:'var(--cream3)'}}>No text yet. Capture or load sample.</p></div>
+            )}
+            {tab==='quick'&&(loading?<div style={{display:'flex',gap:8,alignItems:'center',color:'var(--cream3)',padding:12}}><div className="spinner"/>Analyzing<span className="loading-dots"/></div>
+              :quick.length>0?<>
+                <div style={{fontSize:13.5,fontFamily:'var(--font-display)',fontWeight:600,color:'var(--cream)',marginBottom:12}}>5 Key Ideas</div>
+                {quick.map((idea,i)=><div key={i} className="key-idea animate-in"><div style={{fontFamily:'var(--font-display)',fontSize:20,color:'var(--amber)',fontWeight:700,lineHeight:1.1,flexShrink:0}}>{i+1}</div><div style={{fontSize:13,color:'var(--cream2)',lineHeight:1.5}}>{idea}</div></div>)}
+              </>:<div style={{textAlign:'center',padding:36,opacity:.5}}><p style={{fontSize:13,color:'var(--cream3)'}}>Click ⚡ Quick after loading text</p></div>
+            )}
+            {tab==='deep'&&(loading?<div style={{display:'flex',gap:8,alignItems:'center',color:'var(--cream3)',padding:12}}><div className="spinner"/>Deep analysis<span className="loading-dots"/></div>
+              :deep?<div className="animate-in">
+                <div style={{fontSize:13.5,fontFamily:'var(--font-display)',fontWeight:600,color:'var(--cream)',marginBottom:8}}>Main Thesis</div>
+                <div style={{padding:12,background:'rgba(232,160,66,.07)',border:'1px solid rgba(232,160,66,.18)',borderRadius:8,marginBottom:14,fontSize:13.5,color:'var(--cream)',lineHeight:1.6,fontStyle:'italic'}}>{deep.mainThesis}</div>
+                <div style={{fontSize:13.5,fontFamily:'var(--font-display)',fontWeight:600,color:'var(--cream)',marginBottom:8}}>Key Concepts</div>
+                {(deep.concepts||[]).map((c,i)=><div key={i} className="concept-block"><h5>{c.name}</h5><p>{c.definition}</p>{c.example&&<p style={{marginTop:4,fontSize:12,opacity:.7}}>Ex: {c.example}</p>}</div>)}
+                {deep.keyTakeaway&&<><div style={{fontSize:13.5,fontFamily:'var(--font-display)',fontWeight:600,color:'var(--cream)',marginBottom:8,marginTop:12}}>Key Takeaway</div>
+                <div style={{padding:10,background:'rgba(46,196,182,.07)',border:'1px solid rgba(46,196,182,.2)',borderRadius:8,fontSize:13,color:'var(--teal2)',lineHeight:1.6}}>{deep.keyTakeaway}</div></>}
+              </div>:<div style={{textAlign:'center',padding:36,opacity:.5}}><p style={{fontSize:13,color:'var(--cream3)'}}>Click 🔬 Deep after loading text</p></div>
+            )}
+            {tab==='ask'&&<div style={{display:'flex',flexDirection:'column',height:'100%'}}>
+              {!text?<div style={{textAlign:'center',padding:32,opacity:.5}}><p style={{color:'var(--cream3)',fontSize:13}}>Load text first, then ask questions about the content</p></div>:<>
+                <div style={{padding:'8px 10px',background:'rgba(46,196,182,.06)',border:'1px solid rgba(46,196,182,.18)',borderRadius:7,marginBottom:10,fontSize:12,color:'var(--teal2)'}}>💡 Answers are grounded only in the scanned text</div>
+                <div className="rag-messages">
+                  {ragMsgs.map((m,i)=>(
+                    <div key={i} style={{display:'flex',gap:7,flexDirection:m.role==='user'?'row-reverse':'row'}}>
+                      <div style={{width:24,height:24,borderRadius:'50%',background:m.role==='user'?'var(--amber3)':'var(--bg4)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,flexShrink:0}}>{m.role==='user'?'U':'📖'}</div>
+                      <div style={{maxWidth:'80%',background:'var(--bg3)',border:'1px solid var(--border)',borderRadius:8,padding:'8px 10px',fontSize:13,color:'var(--cream2)',lineHeight:1.55}} className={m.streaming?'streaming':''}>{m.content||<span className="loading-dots" style={{color:'var(--cream3)'}}></span>}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{display:'flex',gap:7,marginTop:'auto'}}>
+                  <input className="input" style={{flex:1}} value={ragIn} onChange={e=>setRagIn(e.target.value)} onKeyDown={e=>e.key==='Enter'&&askBook()} placeholder="Ask about the text..."/>
+                  <button className="btn btn-primary btn-sm" onClick={askBook} disabled={!ragIn.trim()}>Ask</button>
+                </div>
+              </>}
+            </div>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LibraryPage({savedBooks,onRemove}){
+  const[reading,setReading]=useState([]);const[finished,setFinished]=useState([]);
+  const[progress,setProgress]=useState({});const[selBook,setSelBook]=useState(null);
+  const moveRead=(b)=>{if(!reading.find(r=>r.id===b.id))setReading(r=>[...r,b]);setProgress(p=>({...p,[b.id]:p[b.id]||10}));};
+  const moveDone=(b)=>{if(!finished.find(f=>f.id===b.id))setFinished(f=>[...f,b]);setReading(r=>r.filter(r=>r.id!==b.id));setProgress(p=>({...p,[b.id]:100}));};
+  const cols=[{k:'saved',t:'📌 Saved',books:savedBooks},{k:'reading',t:'📖 Reading',books:reading},{k:'finished',t:'✅ Finished',books:finished}];
+  return(
+    <div className="page">
+      <div className="page-header"><h2>My Library</h2><p>{savedBooks.length+reading.length+finished.length} books across all lists</p></div>
+      <div className="library-columns">
+        {cols.map(col=>(
+          <div key={col.k}>
+            <div className="library-col-header">
+              <h3 style={{fontFamily:'var(--font-display)',fontSize:16,fontWeight:600,color:'var(--cream)'}}>{col.t}</h3>
+              <span style={{width:22,height:22,borderRadius:'50%',background:'var(--bg3)',border:'1px solid var(--border)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,color:'var(--cream3)'}}>{col.books.length}</span>
+            </div>
+            {col.books.length===0?<div className="card-sm" style={{textAlign:'center',opacity:.5}}><p style={{fontSize:12.5,color:'var(--cream3)',lineHeight:1.6}}>{col.k==='saved'?'Save books from search or chat':'No books here yet'}</p></div>
+            :col.books.map(b=>(
+              <div key={b.id} className="library-book" onClick={()=>setSelBook(b)}>
+                <div style={{display:'flex',gap:8}}>
+                  <span style={{fontSize:20,flexShrink:0}}>{b.cover}</span>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontFamily:'var(--font-display)',fontSize:14,fontWeight:600,color:'var(--cream)',lineHeight:1.2}}>{b.title}</div>
+                    <div style={{fontSize:11.5,color:'var(--cream3)',marginTop:2}}>{b.author}</div>
+                    <div style={{display:'flex',gap:5,marginTop:6,flexWrap:'wrap'}}>
+                      <span className="badge badge-teal" style={{fontSize:10.5}}>Shelf {b.shelf}</span>
+                      {col.k==='saved'&&<button className="badge badge-blue" style={{cursor:'pointer',border:'none',fontSize:10.5}} onClick={e=>{e.stopPropagation();moveRead(b);}}>→ Start</button>}
+                      {col.k==='reading'&&<button className="badge badge-green" style={{cursor:'pointer',border:'none',fontSize:10.5}} onClick={e=>{e.stopPropagation();moveDone(b);}}>✓ Done</button>}
+                      {col.k==='finished'&&<span className="badge badge-amber" style={{fontSize:10.5}}>Complete</span>}
+                    </div>
+                  </div>
+                </div>
+                {(col.k==='reading'||col.k==='finished')&&<div style={{marginTop:10}}>
+                  <div className="progress-bar"><div className="progress-fill" style={{width:`${progress[b.id]||0}%`}}/></div>
+                  {col.k==='reading'&&<div style={{display:'flex',alignItems:'center',gap:6,marginTop:5}}>
+                    <span style={{fontSize:11,color:'var(--cream3)'}}>Progress</span>
+                    <input type="range" min="0" max="100" step="1" value={progress[b.id]||0} style={{flex:1,height:3}} onChange={e=>{e.stopPropagation();setProgress(p=>({...p,[b.id]:+e.target.value}));}} onClick={e=>e.stopPropagation()}/>
+                    <span style={{fontSize:11,color:'var(--teal2)',minWidth:28}}>{progress[b.id]||0}%</span>
+                  </div>}
+                </div>}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+      {selBook&&<BookModal book={selBook} onClose={()=>setSelBook(null)} onSave={()=>{}} saved={savedBooks.some(b=>b.id===selBook.id)}/>}
+    </div>
+  );
+}
+
+function TranslatePage(){
+  const[src,setSrc]=useState('ja');const[tgt,setTgt]=useState('vi');
+  const[inp,setInp]=useState('');const[out,setOut]=useState('');
+  const[notes,setNotes]=useState([]);const[loading,setLoading]=useState(false);
+  const LANGS={en:'English',ja:'Japanese',vi:'Vietnamese',zh:'Chinese',fr:'French',es:'Spanish',de:'German',ko:'Korean'};
+  const SAMP={ja:'本は人間の最高の友人である。読書を通じて、私たちは偉大な思想家の知恵を学ぶことができます。',zh:'书籍是人类进步的阶梯。通过阅读，我们可以了解伟大思想家的智慧。',fr:"Les livres sont les meilleurs amis de l'homme. La lecture nous permet d'apprendre la sagesse des grands penseurs.",en:'Books are mankind\'s greatest friends. Through reading we learn the wisdom of the great thinkers of the past.'};
+  const doTranslate=async()=>{
+    if(!inp.trim())return;setLoading(true);setOut('');setNotes([]);
+    const sys=`Translate from ${LANGS[src]} to ${LANGS[tgt]}. Respond ONLY as JSON: {"translation":"...","annotations":[{"original":"...","translation":"...","explanation":"grammar/cultural note"}]}`;
+    try{const res=await jsonGemini([{role:'user',content:inp}],sys);setOut(res.translation||'');setNotes(res.annotations||[]);}
+    catch{setOut('Translation service unavailable.');}
+    setLoading(false);
+  };
+  const swap=()=>{setSrc(tgt);setTgt(src);setInp(out);setOut('');setNotes([]);};
+  return(
+    <div className="page">
+      <div className="page-header"><h2>Translate & Explain</h2><p>Multi-language translation with grammar and cultural annotations</p></div>
+      <div className="translate-layout">
+        <div className="translate-panel">
+          <div className="translate-panel-header">
+            <span style={{fontSize:13,color:'var(--cream2)',fontWeight:500}}>Source</span>
+            <select value={src} onChange={e=>setSrc(e.target.value)}>{Object.entries(LANGS).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
+          </div>
+          <textarea className="translate-textarea" value={inp} onChange={e=>setInp(e.target.value)} placeholder="Enter text to translate..."/>
+          <div style={{padding:'9px 16px',borderTop:'1px solid var(--border)',display:'flex',gap:6}}>
+            {SAMP[src]&&<button className="btn btn-ghost btn-sm" onClick={()=>setInp(SAMP[src])}>Load Sample</button>}
+            <button className="btn btn-ghost btn-sm" onClick={()=>setInp('')}>Clear</button>
+          </div>
+        </div>
+        <div className="translate-panel">
+          <div className="translate-panel-header">
+            <span style={{fontSize:13,color:'var(--cream2)',fontWeight:500}}>Translation</span>
+            <select value={tgt} onChange={e=>setTgt(e.target.value)}>{Object.entries(LANGS).map(([k,v])=><option key={k} value={k}>{v}</option>)}</select>
+          </div>
+          {loading?<div style={{display:'flex',gap:8,alignItems:'center',padding:20,color:'var(--cream3)'}}><div className="spinner"/>Translating<span className="loading-dots"/></div>
+          :<textarea className="translate-textarea" value={out} readOnly placeholder="Translation appears here..."/>}
+          {notes.length>0&&notes.slice(0,4).map((n,i)=>(
+            <div key={i} className="annotation-block"><h5>「{n.original}」→ {n.translation}</h5><p>{n.explanation}</p></div>
+          ))}
+        </div>
+      </div>
+      <div style={{display:'flex',gap:8,marginTop:14}}>
+        <button className="btn btn-primary" onClick={doTranslate} disabled={!inp.trim()||loading}>{loading?<><div className="spinner"/>Translating...</>:'🌐 Translate'}</button>
+        <button className="btn btn-ghost" onClick={swap}>⇄ Swap</button>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const[page,setPage]=useState('home');
+  const[saved,setSaved]=useState([]);
+  const[notif,setNotif]=useState(null);
+  const saveBook=(b)=>{if(saved.find(s=>s.id===b.id)){show('Already in library');return;}setSaved(s=>[...s,b]);show(`"${b.title}" saved ✓`);};
+  const show=(m)=>{setNotif(m);setTimeout(()=>setNotif(null),2800);};
+  
+  const NAV=[
+    {i:'🏠',l:'Home',p:'home'},{i:'💬',l:'AI Chat',p:'chat'},{i:'🔍',l:'Semantic Search',p:'search'},
+    {i:'🗺️',l:'Library Map',p:'map'},{i:'📷',l:'OCR Scanner',p:'scanner'},
+    {i:'📚',l:'My Library',p:'library',b:saved.length||null},{i:'🌐',l:'Translate',p:'translate'},
+    {i:'🍿',l:'Movie Web',p:'movie', ext:'https://minhmvp.github.io/MovieWeb/'}
+  ];
+
+  const render=()=>{switch(page){
+    case'home':return<HomePage setPage={setPage}/>;
+    case'chat':return<ChatPage savedBooks={saved} onSave={saveBook}/>;
+    case'search':return<SearchPage onSave={saveBook} savedBooks={saved}/>;
+    case'map':return<MapPage/>;
+    case'scanner':return<ScannerPage/>;
+    case'library':return<LibraryPage savedBooks={saved} onRemove={id=>setSaved(s=>s.filter(b=>b.id!==id))}/>;
+    case'translate':return<TranslatePage/>;
+    default:return<HomePage setPage={setPage}/>;
+  }};
+
+  return(
+    <div className="app">
+      <aside className="sidebar">
+        <div className="sidebar-logo">
+          <h1>LibWise <span style={{color:'var(--teal)'}}>AI</span></h1>
+          <span>Smart Digital Library</span>
+        </div>
+        <nav className="sidebar-nav">
+          <div className="nav-section">Features</div>
+          {NAV.map(n=>(
+            <div key={n.p} className={`nav-item${page===n.p?' active':''}`} onClick={()=> n.ext ? window.open(n.ext, '_blank') : setPage(n.p)}>
+              <span style={{fontSize:15}}>{n.i}</span>
+              <span style={{flex:1}}>{n.l}</span>
+              {n.ext && <span style={{fontSize:12, opacity:0.6}}>↗</span>} 
+              {n.b?<span style={{minWidth:18,height:18,background:'var(--amber)',color:'#0A0600',borderRadius:9,display:'flex',alignItems:'center',justifyContent:'center',fontSize:10,fontWeight:700}}>{n.b}</span>:null}
+            </div>
+          ))}
+        </nav>
+        <div className="sidebar-footer">
+          <div style={{display:'flex',gap:7,alignItems:'center',marginBottom:6}}>
+            <div style={{width:7,height:7,borderRadius:'50%',background:'var(--green)'}}/>
+            <span style={{fontSize:11.5,color:'var(--cream3)'}}>GROUP 4 Connected</span>
+          </div>
+          <p>LibWise AI v1.0 · Design by G4</p>
+        </div>
+      </aside>
+      <main className="main">
+        <div style={{height:3,background:'linear-gradient(90deg,var(--amber),var(--teal))',flexShrink:0}}/>
+        {render()}
+      </main>
+      {notif&&<div style={{position:'fixed',bottom:22,right:22,background:'var(--bg2)',border:'1px solid var(--border2)',borderRadius:10,padding:'11px 18px',fontSize:13.5,color:'var(--cream)',boxShadow:'0 4px 24px rgba(0,0,0,.5)',zIndex:999,animation:'fadeUp .25s ease'}}>{notif}</div>}
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
